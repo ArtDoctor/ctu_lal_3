@@ -38,13 +38,11 @@ def get_matrix_input(n: int, m: int) -> np.ndarray:
     return np.array(matrix)
 
 
-def determinant(matrix: np.ndarray) -> float:
-    """Calculate the determinant of a matrix using Gaussian elimination."""
+def GEM(matrix: np.ndarray) -> np.ndarray:
+    """Perform Gaussian elimination on a matrix."""
     n = matrix.shape[0]
     matrix = matrix.astype(float)
-    det = 1.0
 
-    # Reduce the matrix to upper triangular form
     for col in range(0, n-1):
         # Check if the diagonal element is 0
         if matrix[col, col] == 0:
@@ -54,16 +52,23 @@ def determinant(matrix: np.ndarray) -> float:
                     saved_row = matrix[col].copy()
                     matrix[col] = matrix[row]
                     matrix[row] = saved_row
-                    det = det * -1
                     break
-
-                # If no non-zero element is found, the determinant is 0 (the matrix is singular)
-                if row == n-1:
-                    return np.array(0.0)
 
         # Eliminate the elements below the diagonal in the same column
         for row in range(n-1, col, -1):
             matrix[row] = matrix[row] - matrix[col] * (matrix[row, col] / matrix[col, col])
+
+    return matrix
+
+
+def determinant(matrix: np.ndarray) -> float:
+    """Calculate the determinant of a matrix using Gaussian elimination."""
+    n = matrix.shape[0]
+    matrix = matrix.astype(float)
+    det = 1.0
+
+    # Reduce the matrix to upper triangular form
+    matrix = GEM(matrix)
 
     # Calculate the determinant by multiplying the diagonal elements
     for i in range(n):

@@ -1,5 +1,5 @@
 import numpy as np
-from utils import get_number_input, get_matrix_input, determinant, get_column_input, dot
+from utils import get_number_input, get_matrix_input, determinant, get_column_input, dot, GEM
 
 
 def is_positive_definite(matrix: np.ndarray) -> bool:
@@ -17,25 +17,28 @@ def scalar_product(u: list[np.ndarray], v: list[np.ndarray], A: np.ndarray) -> f
 
 def check_linear_independence(vectors: list[np.ndarray]) -> bool:
     """ Check if a list of vectors is linearly independent."""
-    # TODO
-    return True
+    row_echelon = GEM(np.array(vectors))
+    rank = sum(any(row != 0) for row in row_echelon)
+    return rank == len(vectors)
 
 
 def gram_schmidt(vectors: list[np.ndarray], A: np.ndarray) -> list[np.ndarray]:
     """ Perform the Gram-Schmidt orthogonalization process. """
     n = len(vectors)
-    orthogonal = []
+    orthogonal_vectors = []
     
     for i in range(n):
         temp_vec = vectors[i]
         for j in range(i):
-            proj = scalar_product(vectors[i], orthogonal[j], A) / scalar_product(orthogonal[j], orthogonal[j], A)
-            temp_vec = temp_vec - proj * np.array(orthogonal[j])
-        if not check_linear_independence(temp_vec):  # Near zero vector implies linear dependence
+            proj = scalar_product(vectors[i], orthogonal_vectors[j], A) / \
+                   scalar_product(orthogonal_vectors[j], orthogonal_vectors[j], A)
+            temp_vec = temp_vec - proj * np.array(orthogonal_vectors[j])
+        if not check_linear_independence([temp_vec] + orthogonal_vectors[:i]):
             raise ValueError("Vectors are not linearly independent.")
-        orthogonal.append(temp_vec)
-    
-    return orthogonal
+        orthogonal_vectors.append(temp_vec)
+
+    return orthogonal_vectors
+
 
 def main():
     # User input for matrix dimension
