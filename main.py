@@ -17,8 +17,13 @@ def scalar_product(u: list[np.ndarray], v: list[np.ndarray], A: np.ndarray) -> f
 
 def check_linear_independence(vectors: list[np.ndarray]) -> bool:
     """ Check if a list of vectors is linearly independent."""
+    # Perform Gaussian Elimination to obtain the row echelon form of the matrix
     row_echelon = GEM(np.array(vectors))
+    
+    # Count the number of non-zero rows in the row echelon form
     rank = sum(any(row != 0) for row in row_echelon)
+    
+    # Check if the rank is equal to the number of vectors
     return rank == len(vectors)
 
 
@@ -30,11 +35,15 @@ def gram_schmidt(vectors: list[np.ndarray], A: np.ndarray) -> list[np.ndarray]:
     for i in range(n):
         temp_vec = vectors[i]
         for j in range(i):
+            # Compute the projection of vectors[i] onto orthogonal_vectors[j]
             proj = scalar_product(vectors[i], orthogonal_vectors[j], A) / \
                    scalar_product(orthogonal_vectors[j], orthogonal_vectors[j], A)
+            # Subtract the projection from vectors[i]
             temp_vec = temp_vec - proj * np.array(orthogonal_vectors[j])
+        # Check if the resulting vector is linearly independent from previous orthogonal vectors
         if not check_linear_independence([temp_vec] + orthogonal_vectors[:i]):
             raise ValueError("Vectors are not linearly independent.")
+        # Add the orthogonalized vector to the list of orthogonal vectors
         orthogonal_vectors.append(temp_vec)
 
     return orthogonal_vectors
